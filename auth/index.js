@@ -4,6 +4,7 @@ const jwt  = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { expressjwt: expressJwt } = require("express-jwt");
 const User = require('./user')
+const config = require('./config.js');
 
 mongoose.connect("mongodb+srv://abuid:Pipitequiero10@cluster0.iamow.mongodb.net/auth?retryWrites=true&w=majority")
 
@@ -12,8 +13,9 @@ app.use(express.json())
 
 //forma corta de crear un objeto es simplemente pasarle la propiedad yesta crea la propiedad con ese nombre 
 // y el contenido de esta misma
-const signToken = (_id)=> jwt.sign({_id},'mi-string-secreto')
-const validateJwt = expressJwt({secret:'mi-string-secreto',algorithms:['HS256']})
+
+const signToken = (_id)=> jwt.sign({_id},`${config.SECRET}`)
+const validateJwt = expressJwt({secret:`${config.SECRET}`,algorithms:['HS256']})
 const findAndAssingUser = async (req,res,next)=>{
     try {
         const user = await User.findById(req.auth._id)
