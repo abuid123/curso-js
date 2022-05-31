@@ -27,6 +27,10 @@ const findAndAssingUser = async (req,res,next)=>{
     }
 }
 
+app.get("*",(req,res)=>{
+    res.status(404).sendFile(`${__dirname}/404.html`);
+});
+
 app.post('/register', async (req,res)=>{
     const {body} = req
     try {
@@ -67,10 +71,20 @@ app.post('/login', async (req,res)=>{
     }
 })
 
-
 const isAuthenticated = express.Router().use(validateJwt,findAndAssingUser)
+
 app.get('/lele',isAuthenticated ,(req,res)=>{
+    throw new Error('Nuevo error')
     res.send(req.user)
+})
+
+app.use((err,req,res,next)=>{
+    console.error('Mi nuevo error',err.stack)
+    next(err)
+})
+
+app.use((err,req,res,next)=>{
+    res.send('Ha ocurrido un error :c')
 })
 
 app.listen(3000,()=>{
