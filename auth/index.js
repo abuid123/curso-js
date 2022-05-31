@@ -14,7 +14,18 @@ app.use(express.json())
 // y el contenido de esta misma
 const signToken = (_id)=> jwt.sign({_id},'mi-string-secreto')
 const validateJwt = expressJwt({secret:'mi-string-secreto',algorithms:['HS256']})
-
+const findAndAssingUser = async (req,res,next)=>{
+    try {
+        const user = await User.findById(req.auth._id)
+        if(!user){
+            return res.status(401).end()
+        }
+        req.user = user
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
 
 app.post('/register', async (req,res)=>{
     const {body} = req
@@ -56,9 +67,10 @@ app.post('/login', async (req,res)=>{
     }
 })
 
-app.get('/lele',validateJwt,(req,res,next)=>{
-    console.log('lala',req.auth);
-    res.send('Ok')
+
+const isAuthenticated = express.Router().use(validateJwt,findAndAssingUser)
+app.get('/lele',isAuthenticated ,(req,res)=>{
+    res.send(req.user)
 })
 
 app.listen(3000,()=>{
