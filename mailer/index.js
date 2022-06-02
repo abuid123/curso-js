@@ -29,9 +29,23 @@ app.get('/', (req, res) => {
 //         })
 })
 
-app.post('/send',(req,res)=>{
-    console.log(req.body)
-    res.status(401).send('correo malo')
+app.post('/send',async (req,res)=>{
+    const {to, subject, html} = req.body
+
+    const msg = {
+        to,
+        from: process.env.FROM,
+        subject,
+        html
+    }
+
+    try {
+        await sgMail.send(msg)
+        res.sendStatus(204) //204 no content
+    } catch (error) {
+        const messages = error.response.body.errors.map(e => e.message).join(' ')
+        res.status(400).send(messages)
+    }
 })
 
 app.listen(3000, () => {

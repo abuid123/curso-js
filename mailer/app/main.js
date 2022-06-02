@@ -12,7 +12,6 @@ window.onload = ()=>{
             }
         })
         const responseText = await response.text();
-        console.log(responseText)
         if(response.status > 300){
             document.getElementById('error').innerHTML = responseText
             return
